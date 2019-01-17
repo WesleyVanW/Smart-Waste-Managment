@@ -14,12 +14,15 @@
 #define I2C_ACK         (0)
 #endif
 
-float getGPSCoordinates(void)
+//static float returnvalues (float *latitude, float *longitude);
+
+void getGPSCoordinates(float* lat, float* lon)
 {
 
     char  reg[255];
     //char * token;
     struct minmea_sentence_rmc frame;
+    //float tempLat,tempLongi;
     int  k=0;
     char data[74];
     bool sentenceNotFound=true;
@@ -82,7 +85,7 @@ float getGPSCoordinates(void)
            }
         }
         
-
+        
         printf("\nDit is data: ");
         for(int i=0;i<74;i++)   
         {
@@ -94,24 +97,32 @@ float getGPSCoordinates(void)
             }*/
         }
         
-    int res = minmea_parse_rmc(&frame, data);
+    
+    int res = minmea_parse_rmc(&frame, "$GNRMC,105824.000,A,5110.577055,N,00420.844651,E,0.42,285.58,080119,,,A*73");
     if (!res) {
         puts("FAILURE: error parsing GPS sentence");
     }
         printf("\n");
- 
+        *lat = minmea_tocoord(&frame.latitude);
+        *lon = minmea_tocoord(&frame.longitude);
+        //tempLat = minmea_tocoord(&frame.latitude);
+        //tempLongi = minmea_tocoord(&frame.longitude);
         
-        printf("parsed coordinates: lat=%f lon=%f\n",
+        printf("First parsed coordinates: lat=%f lon=%f\n",
                 minmea_tocoord(&frame.latitude),
                 minmea_tocoord(&frame.longitude));
+        printf("\n");
+
         puts("SUCCESS");
+        //printf("parsed coordinates: lat=%f lon=%f\n",tempLat,tempLongi);
+       // printf("\n");
+        //*lat=tempLat;
+        //*lon=tempLongi;
      sentenceNotFound = false;
 
 }
         printf("Coordinates received");
 
-        return minmea_tocoord(&frame.latitude),
-               minmea_tocoord(&frame.longitude);
 }
 
 //$GNRMC,105824.000,A,5110.577055,N,00420.844651,E,0.42,285.58,080119,,,A*73
