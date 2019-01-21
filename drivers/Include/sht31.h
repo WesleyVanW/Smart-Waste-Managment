@@ -14,9 +14,9 @@
  */
  #ifndef SHT31_H
 #define SHT31_H
- #include <stdint.h>
+#include <stdint.h>
 #include "periph/i2c.h"
- #ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
  /** possible I2C slave addresses */
