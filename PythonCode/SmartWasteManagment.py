@@ -29,6 +29,8 @@ def on_message_D7(client, userdata, message):
                    'y_axis' : parsedCommando.actions[3],
                    'z_axis' : parsedCommando.actions[4],
                    'distance' : parsedCommando.actions[5],
+                   'latitude' : parsedCommando.actions[6] + parsedCommando.actions[7]/1000,
+                   'longitude': parsedCommando.actions[8] + parsedCommando.actions[9]/1000,
                    'device': 'SmartWasteManagement',
                    'metadata': {
                        'frequency': 868.1,
@@ -47,6 +49,8 @@ def on_message_D7(client, userdata, message):
                         'y_axis': float(payload['y_axis']),
                         'z_axis': float(payload['z_axis']),
                         'distance': float(payload['distance']),
+                        'latitude' : float(payload['latitude']),
+                        'longitude' : float(payload['longitude']),
                         'frequency': float(payload['metadata']['frequency'])
                         }
         tb.sendDeviceTelemetry(device_id, current_ts_ms, tb_telemetry)
@@ -58,7 +62,7 @@ def on_message_LoRa(client, userdata, message):
 
     msg = json.loads(message.payload.decode("utf-8"))
     payloadmsg = msg["payload_fields"]
-    print("Temp: ", str(msg["payload_fields"]['temperatuur']))
+
     current_ts_ms = int(round(time.time() * 1000))  # current timestamp in milliseconds, needed for Thingsboard
 
     print("----adjusting payload LoRa----")
@@ -67,6 +71,8 @@ def on_message_LoRa(client, userdata, message):
                'y_axis': str(payloadmsg['y_axis']),
                'z_axis': str(payloadmsg['z_axis']),
                'distance' : str(payloadmsg['distance']),
+               'latitude': str(payloadmsg['latitude']),
+               'longitude' : str(payloadmsg['longitude']),
                'device': 'SmartWasteManagement',
                'metadata': {
                    'frequency': 868.1,
@@ -86,6 +92,8 @@ def on_message_LoRa(client, userdata, message):
                     'y_axis': float(payload['y_axis']),
                     'z_axis': float(payload['z_axis']),
                     'distance': float(payload['distance']),
+                    'latitude': float(payload['latitude']),
+                    'longitude': float(payload['longitude']),
                     'frequency': float(payload['metadata']['frequency'])}
     tb.sendDeviceTelemetry(device_id, current_ts_ms, tb_telemetry)
 
