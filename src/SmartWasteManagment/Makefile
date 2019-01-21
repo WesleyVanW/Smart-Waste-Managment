@@ -3,6 +3,7 @@ APPLICATION = SmartWasteManagment
 
 DRIVER ?= sht31
 DRIVER ?= lsm303agr
+DRIVER ?= GPS
 BOARD ?= octa
 
 USEMODULE += sht31
@@ -14,6 +15,8 @@ USEMODULE += ps
 USEMODULE += xtimer
 USEMODULE += periph_gpio_irq 
 USEMODULE += srf04
+USEMODULE += GPS
+USEMODULE += printf_float
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../../../RIOT
