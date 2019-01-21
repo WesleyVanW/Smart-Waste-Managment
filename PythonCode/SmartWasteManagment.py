@@ -14,31 +14,27 @@ from d7a.alp.parser import Parser as AlpParser
 
 ############
 def on_message_D7(client, userdata, message):
-    print("onmessage D7")
-    #print("message topic=", message.topic)
-    #print("message received ", str(message.payload.decode("utf-8")))
-
     #parsing dash7 message using functions from pyd7a/tools/parse_hexstring
     hexstring = str(message.payload.decode("utf-8"))
     data = bytearray(hexstring.decode("hex"))
     parsedCommando = AlpParser().parse(ConstBitStream(data), len(data)) #debug this if you need information on parameters of d7a parsed commando
-    print parsedCommando
 
     current_ts_ms = int(round(time.time() * 1000))  # current timestamp in milliseconds, needed for Thingsboard
 
     if parsedCommando.actions[0].operand.offset.id == 86:
-        print("----adjusting payload----")
+        print("onmessage D7")
+        print("----adjusting payload D7----")
         payload = {'temperatuur' : parsedCommando.actions[0].operand.data[0] + parsedCommando.actions[0].operand.data[1]/100,
-                   'x-axis' : parsedCommando.actions[2],
-                   'y-axis' : parsedCommando.actions[3],
-                    'z-axis' : parsedCommando.actions[4],
+                   'x_axis' : parsedCommando.actions[2],
+                   'y_axis' : parsedCommando.actions[3],
+                   'z_axis' : parsedCommando.actions[4],
                    'distance' : parsedCommando.actions[5],
                    'device': 'SmartWasteManagement',
                    'metadata': {
                        'frequency': 868.1,
                        'data_rate': "SF7125",
                    }}
-        print("-----Payload adjusted-----")
+        print("-----Payload adjusted D7-----")
         device_id = payload['device']
 
         # send non-numeric data ('attributes') to Thingsboard as JSON. Example:
@@ -47,29 +43,37 @@ def on_message_D7(client, userdata, message):
 
         # send numeric data ('telemetry') to Thingsboard as JSON (only floats or integers!!!). Example:
         tb_telemetry = {'temperatuur': float(payload['temperatuur']),
-                        'x-axis': float(payload['x-axis']),
-                        'y-axis': float(payload['y-axis']),
-                        'z-axis': float(payload['z-axis']),
+                        'x_axis': float(payload['x_axis']),
+                        'y_axis': float(payload['y_axis']),
+                        'z_axis': float(payload['z_axis']),
                         'distance': float(payload['distance']),
-                        'frequency': float(payload['metadata']['frequency'])}
+                        'frequency': float(payload['metadata']['frequency'])
+                        }
         tb.sendDeviceTelemetry(device_id, current_ts_ms, tb_telemetry)
 
 ########################################
 ############
 def on_message_LoRa(client, userdata, message):
     print("onmessage LORA")
-    #print("message topic=", message.topic)
-    #print("message received ", str(message.payload.decode("utf-8")))
 
     msg = json.loads(message.payload.decode("utf-8"))
-    #print("Temp: ", str(msg["payload_fields"]['temperature']))
-
+    payloadmsg = msg["payload_fields"]
+    print("Temp: ", str(msg["payload_fields"]['temperatuur']))
     current_ts_ms = int(round(time.time() * 1000))  # current timestamp in milliseconds, needed for Thingsboard
 
-    print("----adjusting payload----")
-    payload = {'temperatuur': str(msg["payload_fields"]['temperature']
-               }
-    print("-----Payload adjusted-----")
+    print("----adjusting payload LoRa----")
+    payload = {'temperatuur': str(payloadmsg['temperatuur']),
+               'x_axis' : str(payloadmsg['x_axis']),
+               'y_axis': str(payloadmsg['y_axis']),
+               'z_axis': str(payloadmsg['z_axis']),
+               'distance' : str(payloadmsg['distance']),
+               'device': 'SmartWasteManagement',
+               'metadata': {
+                   'frequency': 868.1,
+                   'data_rate': "SF7125",
+               }}
+
+    print("-----Payload adjusted LoRa-----")
     device_id = payload['device']
 
     # send non-numeric data ('attributes') to Thingsboard as JSON. Example:
@@ -78,9 +82,9 @@ def on_message_LoRa(client, userdata, message):
 
     # send numeric data ('telemetry') to Thingsboard as JSON (only floats or integers!!!). Example:
     tb_telemetry = {'temperatuur': float(payload['temperatuur']),
-                    'x-axis': float(payload['x-axis']),
-                    'y-axis': float(payload['y-axis']),
-                    'z-axis': float(payload['z-axis']),
+                    'x_axis': float(payload['x_axis']),
+                    'y_axis': float(payload['y_axis']),
+                    'z_axis': float(payload['z_axis']),
                     'distance': float(payload['distance']),
                     'frequency': float(payload['metadata']['frequency'])}
     tb.sendDeviceTelemetry(device_id, current_ts_ms, tb_telemetry)
