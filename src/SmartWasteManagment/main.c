@@ -16,6 +16,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
 #include "xtimer.h"
 #include "sht31.h"
 #include "sht31_params.h" 
@@ -31,6 +32,7 @@
 #include "periph/pm.h"
 #include "srf04_params.h"
 #include "srf04.h"
+#include "getCoo.h"
 
 #define INTERVAL (20U * US_PER_SEC)
 
@@ -150,12 +152,18 @@ int main(void) {
     
     printf("\n-------Initialization fully completed & succesfull--------\n");
     
-    uint8_t array[6];
+    uint8_t array[10];
     uint8_t counter = 0; 
         
     mode = 1; 
 
     int distance = 0;
+    float lati; 
+    float longi;
+    double intpart_lati; 
+    double fractpart_lati;
+    double intpart_longi; 
+    double fractpart_longi;
 
     while (1) {
         int16_t temp;
@@ -199,6 +207,7 @@ int main(void) {
                     puts("\nCould not read data from lsm303agr sensor - Accelerometer\n");
                 }
 
+                //Measuring distance
                 distance = srf04_get_distance(&dev3);
                 if (distance < SRF04_OK) {
                     puts("Could not read data from srf04 sensor - Ultrasone");
@@ -206,11 +215,25 @@ int main(void) {
                 else { 
                     printf("Distance sensor: %d mm\n", distance);
                     array[5] = (uint8_t) distance;
-                }
+                } 
+
+                //Measuring coordinates 
+                getGPSCoordinates(&lati, &longi); 
+                printf("\nPointerLat = %f and pointerLong = %f",lati,longi);
+                printf("\n");
+                //Conversion to sendable lenghts 
+                fractpart_lati = modf (lati , &intpart_lati);
+                fractpart_longi = modf (longi , &intpart_longi);
+                array[6] = (uint8_t) intpart_lati; 
+                array[7] = (uint8_t) (fractpart_lati * 1000); 
+                array[8] = (uint8_t) intpart_longi; 
+                array[9] = (uint8_t) (fractpart_longi * 1000);
+
+                
             }
             //Communication
             printf("Sending information to backend...");
-            modem_status_t status = modem_send_unsolicited_response(0x56, 0, 6, array, current_interface_id, current_interface_config);
+            modem_status_t status = modem_send_unsolicited_response(0x56, 0, 10, array, current_interface_id, current_interface_config);
             uint32_t duration_usec = xtimer_now_usec() - start;
             printf("Command completed in %li ms\n", duration_usec / 1000);
             if(status == MODEM_STATUS_COMMAND_COMPLETED_SUCCESS) {
@@ -230,7 +253,7 @@ int main(void) {
         }
         else { 
             uint32_t start = xtimer_now_usec(); 
-            printf("inactive...");
+            printf("inactive...\n");
             uint32_t duration_usec = xtimer_now_usec() - start;
             printf("Command completed in %li ms\n", duration_usec / 1000);
             xtimer_periodic_wakeup(&last_wakeup, INTERVAL);
