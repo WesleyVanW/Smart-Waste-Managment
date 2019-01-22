@@ -34,17 +34,12 @@
 #include "srf04.h"
 #include "getCoo.h"
 
-#define INTERVAL (20U * US_PER_SEC)
+#define INTERVAL (20U * US_PER_SEC) //20 seconds
 
 #define LORAWAN_NETW_SESSION_KEY  { 0xC6, 0xA0, 0x55, 0x22, 0x4F, 0x25, 0xD2, 0x77, 0x9C, 0x83, 0x5C, 0x15, 0x38, 0xBC, 0x7A, 0x9D }
 #define LORAWAN_APP_SESSION_KEY  { 0x2F, 0xDC, 0x45, 0x93, 0x0B, 0x5E, 0x44, 0x54, 0x7B, 0xB1, 0xC1, 0x73, 0x4C, 0x9B, 0x16, 0x3D }
 #define LORAWAN_DEV_ADDR 0x26011921
 #define LORAWAN_NETW_ID 0x000000
-
-#define WAKEUP_INTERVAL (1U * US_PER_SEC)                                           // 1 second (in µs)
-#define TIME_TO_SLEEP (16U * US_PER_SEC)                                            // 16 seconds (in µs)
-#define TIME_TO_SEND (5U * US_PER_SEC)                                              // 5 seconds (in µs)
-#define MOTION_INTERVAL (1u * US_PER_SEC)
 
 static int mode;                                                                    //0=sleep, 1=active
 
@@ -100,6 +95,7 @@ int main(void) {
     sht31_dev_t dev; 
     lsm303agr_t dev2; 
     srf04_t dev3;
+    int res;
 
     modem_callbacks_t modem_callbacks = {
         .command_completed_callback = &on_modem_command_completed_callback,
@@ -114,13 +110,13 @@ int main(void) {
     printf("modem UID: %02X%02X%02X%02X%02X%02X%02X%02X\n", uid[0], uid[1], uid[2], uid[3], uid[4], uid[5], uid[6], uid[7]);
     
     xtimer_ticks32_t last_wakeup = xtimer_now();
+
+    puts("Smart Waste Managment Application"); 
+    printf("+------------Initial configuration: D7 mode------------+\n");
     alp_itf_id_t current_interface_id = ALP_ITF_ID_D7ASP;
     void* current_interface_config = (void*)&d7_session_config;
-
-    int res;
     
-    puts("Smart Waste Managment Application");
-    printf("+------------Initializing------------+\n");
+    printf("+------------Initializing Sensors------------+\n");
     if ((res = sht31_init(&dev, &sht31_params[0])) != SHT31_OK) {
         puts("Initialization failed\n");
         return 1;
@@ -152,7 +148,7 @@ int main(void) {
     
     printf("\n-------Initialization fully completed & succesfull--------\n");
     
-    uint8_t array[10];
+    uint8_t array[14];
     uint8_t counter = 0; 
         
     mode = 1; 
@@ -160,10 +156,8 @@ int main(void) {
     int distance = 0;
     float lati; 
     float longi;
-    double intpart_lati; 
-    double fractpart_lati;
-    double intpart_longi; 
-    double fractpart_longi;
+    bool connectionFailed = false;
+    int length = 0; 
 
     while (1) {
         int16_t temp;
@@ -173,17 +167,30 @@ int main(void) {
         if (mode) {
             uint32_t start = xtimer_now_usec();
             
-            if(current_interface_id == ALP_ITF_ID_D7ASP) {
-                printf("Switching to LoRaWAN\n");
+            //Only use LoRa if no d7 connection
+            if(current_interface_id == ALP_ITF_ID_D7ASP && connectionFailed) {
+                printf("\nSwitching to LoRaWAN mode\n");
                 current_interface_id = ALP_ITF_ID_LORAWAN_ABP;
                 current_interface_config = &lorawan_session_config;
             } 
-            else {
-                printf("Switching to D7AP\n");
+            else if (current_interface_id == ALP_ITF_ID_LORAWAN_ABP) {
+                printf("\nSwitching to D7 mode\n");
                 current_interface_id = ALP_ITF_ID_D7ASP;
                 current_interface_config = &d7_session_config;
             }
             
+            //Use LoRa fist then after D7
+            // if(current_interface_id == ALP_ITF_ID_D7ASP) {
+            //     printf("\nSwitching to LoRaWAN mode\n");
+            //     current_interface_id = ALP_ITF_ID_LORAWAN_ABP;
+            //     current_interface_config = &lorawan_session_config;
+            // } 
+            // else {
+            //     printf("\nSwitching to D7 mode\n");
+            //     current_interface_id = ALP_ITF_ID_D7ASP;
+            //     current_interface_config = &d7_session_config;
+            // }
+
             //Measuring payload
             if(counter == 0) {
                 // Measuring temperature
@@ -213,51 +220,72 @@ int main(void) {
                     puts("Could not read data from srf04 sensor - Ultrasone");
                 } 
                 else { 
-                    printf("Distance sensor: %d mm\n", distance);
+                    printf("Distance: %d mm\n", distance);
                     array[5] = (uint8_t) distance;
                 } 
 
                 //Measuring coordinates 
                 getGPSCoordinates(&lati, &longi); 
-                printf("\nPointerLat = %f and pointerLong = %f",lati,longi);
+                printf("\nLatitude = %f & Longitude = %f",lati,longi);
                 printf("\n");
                 //Conversion to sendable lenghts 
-                fractpart_lati = modf (lati , &intpart_lati);
-                fractpart_longi = modf (longi , &intpart_longi);
-                array[6] = (uint8_t) intpart_lati; 
-                array[7] = (uint8_t) (fractpart_lati * 1000); 
-                array[8] = (uint8_t) intpart_longi; 
-                array[9] = (uint8_t) (fractpart_longi * 1000);
+                int32_t gps_latitude_payload = round(lati * 1000000);
+                array[6] = (gps_latitude_payload & 0xFF000000) >> 24;
+                array[7] = (gps_latitude_payload & 0x00FF0000) >> 16;
+                array[8] = (gps_latitude_payload & 0x0000FF00) >> 8;
+                array[9] = (gps_latitude_payload & 0X000000FF);
+
+                int32_t gps_longitude_payload = round(longi * 1000000);
+                array[10] = (gps_longitude_payload & 0xFF000000) >> 24;
+                array[11] = (gps_longitude_payload & 0x00FF0000) >> 16;
+                array[12] = (gps_longitude_payload & 0x0000FF00) >> 8;
+                array[13] = (gps_longitude_payload & 0X000000FF);
 
                 
             }
             //Communication
             printf("Sending information to backend...");
-            modem_status_t status = modem_send_unsolicited_response(0x56, 0, 10, array, current_interface_id, current_interface_config);
-            uint32_t duration_usec = xtimer_now_usec() - start;
-            printf("Command completed in %li ms\n", duration_usec / 1000);
+            if(current_interface_id == ALP_ITF_ID_D7ASP) { 
+                length = 6;
+            }
+            else { 
+                length = 14;
+            }
+            modem_status_t status = modem_send_unsolicited_response(0x56, 0, length, array, current_interface_id, current_interface_config);
             if(status == MODEM_STATUS_COMMAND_COMPLETED_SUCCESS) {
                 printf("Command completed successfully\n");
+                connectionFailed = false;
             } 
             else if(status == MODEM_STATUS_COMMAND_COMPLETED_ERROR) {
                 printf("Command completed with error\n");
+                connectionFailed = true;
             } 
             else if(status == MODEM_STATUS_COMMAND_TIMEOUT) {
                 printf("Command timed out\n");
+                connectionFailed = true;
             }
-            counter++;
+            //Comment this if-else if you want to send both LoRa & D7
+            if (connectionFailed) {
+                counter++;
+            }
+            else { 
+                counter = 0;
+                mode = 0;
+                uint32_t duration_usec = xtimer_now_usec() - start;
+                printf("Command completed in %li ms\n", duration_usec / 1000);
+            }
             if (counter > 1) { 
                 counter = 0;
                 mode = 0;
+                uint32_t duration_usec = xtimer_now_usec() - start;
+                printf("Command completed in %li ms\n", duration_usec / 1000);
             }
         }
-        else { 
-            uint32_t start = xtimer_now_usec(); 
+        else {  
             printf("inactive...\n");
-            uint32_t duration_usec = xtimer_now_usec() - start;
-            printf("Command completed in %li ms\n", duration_usec / 1000);
             xtimer_periodic_wakeup(&last_wakeup, INTERVAL);
-            printf("slept until %" PRIu32 "\n", xtimer_usec_from_ticks(xtimer_now()));
+            //printf("slept until %" PRIu32 "\n", xtimer_usec_from_ticks(xtimer_now()));
+            printf("slept for 20s\n");
         }
     }
     return 0;
