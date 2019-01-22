@@ -25,12 +25,12 @@ def on_message_D7(client, userdata, message):
         print("onmessage D7")
         print("----adjusting payload D7----")
         payload = {'temperatuur' : parsedCommando.actions[0].operand.data[0] + parsedCommando.actions[0].operand.data[1]/100,
-                   'x_axis' : parsedCommando.actions[2],
-                   'y_axis' : parsedCommando.actions[3],
-                   'z_axis' : parsedCommando.actions[4],
-                   'distance' : parsedCommando.actions[5],
-                   'latitude' : parsedCommando.actions[6] + parsedCommando.actions[7]/1000,
-                   'longitude': parsedCommando.actions[8] + parsedCommando.actions[9]/1000,
+                   'x_axis' : parsedCommando.actions[0].operand.data[2],
+                   'y_axis' : parsedCommando.actions[0].operand.data[3],
+                   'z_axis' : parsedCommando.actions[0].operand.data[4],
+                   'distance' : parsedCommando.actions[0].operand.data[5],
+                   'latitude' : parsedCommando.actions[0].operand.data[6] + parsedCommando.actions[0].operand.data[7]/1000,
+                   'longitude': parsedCommando.actions[0].operand.data[8] + parsedCommando.actions[0].operand.data[9]/1000,
                    'device': 'SmartWasteManagement',
                    'metadata': {
                        'frequency': 868.1,
@@ -54,7 +54,6 @@ def on_message_D7(client, userdata, message):
                         'frequency': float(payload['metadata']['frequency'])
                         }
         tb.sendDeviceTelemetry(device_id, current_ts_ms, tb_telemetry)
-
 ########################################
 ############
 def on_message_LoRa(client, userdata, message):
