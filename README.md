@@ -40,7 +40,15 @@ ThingsBoard Account
 
 ### Visualization of project + Course of action
 
---- add picture ---
+![](images/project.png)
+
+#### Device 
+
+The device is mounted on the lid of a garbage bin so it is able to measure the temperature and the capacity inside. The device has a chosen periodic wakeup interval of 20 seconds regarding demonstration purposes during the examination moment. In real life implementations this wakeup interval is chosen based on frequency of disposing waste in the deployment area. The optimal wakeup interval will therefore be different for deployment on site of a music festival in comparison to deployment on a University campus. Depending on whether the lid has moved during a period of sleep, the device will choose two actions. If the lid has been lifted, meaning that its highly likely that waste has been added to the contents of the bin, the device will be set in active mode. During active mode the device will try to send the measured capacity and temperature to a D7 gateway. Only if this transmission fails will the device switch to LoRaWAN mode in which it will send the previously mentioned data along with its calculated latitude and longitude to a nearby LoRa gateway. In the other scenario where the lid hasn't been lifted during a period of periodic sleep, the device will stay in passive mode. It will instantly go back to sleep. 
+
+#### Backend 
+
+The python scripts will subscribe to a MQTT broker for Dash7 and LoRa respectively. It will perform the necessary transformations depending on which message (LoRa/D7) it has received and send it over to ThingsBoard. Only if it has received a Dash7 message it will perform the necessary calculations for indoor localization. 
 
 ### Implementation
 
