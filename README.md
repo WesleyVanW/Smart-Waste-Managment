@@ -156,7 +156,7 @@ endif
   - ThingsBoard 
 - Mouhcine 
   - GPS 
-  - Power measurements
+  - Power measurements GPS
 - Wesley 
   - Sensors (sht31 - Temperature, lsm303agr - Accelerometer)
   - Backend - Python scripts 
