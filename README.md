@@ -1,36 +1,32 @@
-# Project Title
+# SmartWasteManagment
 
-One Paragraph of project description goes here
+SmartWasteManagment is a device which tracks a regular garbage bin indoor aswell as outdoor. The device is triggered when opening the lid and will send valuable data such as inside temperature, capacity and location to either LoRa or Dash7 gateways. This data will be able to be processed by a backend python script to further implement the visualization in ThingsBoard. 
 
-## Getting Started
+## Information
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+Project name: SmartWasteManagment 
+Course: I-IoT Low Power Embedded Communication 
+Professor + Assistents: Maarten Weyn, Michiel Aernouts, Mats De Meyer 
+Contributors: Gregory Gonzalez Lopez, Mouhcine Oulad Ali, Wesley Van Wijnsberghe
 
-### Prerequisites
+### What you need
 
-What things you need to install the software and how to install them
+Vagrant 
+Riot OS : https://github.com/RIOT-OS/RIOT
+Dash7 Python Support: https://github.com/MOSAIC-LoPoW/pyd7a
+Murata Modem Support: https://github.com/MOSAIC-LoPoW/riot-oss7-modem
+Nucleo L496ZG 
+Octa connect shield 
+Octa connect Murata modem shield 
+Octa connnect GPS shield 
+Python 2.7
+MongoDB Compass 
+The Things Network Account 
+ThingsBoard Account
 
-```
-Give examples
-```
+### Visualization of project
 
-### Installing
 
-A step by step series of examples that tell you how to get a development env running
-
-Say what the step will be
-
-```
-Give the example
-```
-
-And repeat
-
-```
-until finished
-```
-
-End with an example of getting some data out of the system or using it for a little demo
 
 ## Running the tests
 
