@@ -128,5 +128,16 @@ endif
 
 ### Connecting ultrasonic sensor to nucleo board
 
+![](images/012f354c0d65accd75367c632d63306b.png)
 
+- Connections: all connected pins on Nucleo are on bottom side
+  - Mosfet: 
+    - Drain --> ground pin on Nucleo 
+    - Gate --> pin PB14 on Nucleo 
+    - Source --> ground pin on ultrasonic sensor 
+  - Ultrasonic sensor: 
+    - VCC --> 5v pin on Nucleo 
+    - echo --> pin PB15 on Nucleo 
+    - Trig --> pin PB1 on Nucleo 
+    - GND --> Source mosfet
 
