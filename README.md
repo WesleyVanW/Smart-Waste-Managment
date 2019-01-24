@@ -38,7 +38,7 @@ The Things Network Account
 
 ThingsBoard Account
 
-### Visualization of project
+### Visualization of project + Course of action
 
 --- add picture ---
 
@@ -52,7 +52,7 @@ ThingsBoard Account
   
   - drivers/include --> RIOT/drivers/include 
   
-  - drivers/ --> RIOT/drivers 
+  - drivers/ --> RIOT/drivers  // if you don't want to overwrite makefiles see later on for workaround 
   
   - src/SmartWasteManagment --> RIOT/tests // other directories are tests for the drivers 
   
@@ -60,7 +60,7 @@ ThingsBoard Account
   
   - sys/auto_init --> RIOT/sys/auto_init
   
-  - Copy the following scripts from PythonCode to a directory of your choosing: backend, localization, SmartWasteManagment
+  - Copy the following scripts from PythonCode to a directory of your choosing: backend, localization, SmartWasteManagment & thingsboard
 
 2. Import the contents of full_dataset.json in a MongoDB database called FingerprintingDB with a collection no_test_ack .
 
@@ -83,55 +83,50 @@ ThingsBoard Account
 11. The actions are monitorable in a serial monitor (Putty) when connected to the Octa board.
 
 
-  
+## Copy code to Makefile.dep & Makefile.include in case of not wanting to overwrite
 
-### Break down into end to end tests
-
-Explain what these tests test and why
-
+- Makefile.dep: 
 ```
-Give an example
+ifneq (,$(filter GPS,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+endif 
+
+ifneq (,$(filter lsm303agr,$(USEMODULE)))
+   FEATURES_REQUIRED += periph_i2c
+endif 
+
+ifneq (,$(filter srf04,$(USEMODULE)))
+  USEMODULE += xtimer
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
+endif 
+
+ifneq (,$(filter sht31,$(USEMODULE)))
+  USEMODULE += xtimer
+  FEATURES_REQUIRED += periph_i2c
+endif
 ```
 
-### And coding style tests
+- Makefile.include: 
+``` 
+ifneq (,$(filter sht31,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/sht31/include
+endif 
 
-Explain what these tests test and why
+ifneq (,$(filter GPS,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/GPS/include
+endif 
 
+ifneq (,$(filter lsm303agr,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/lsm303agr/include
+endif 
+
+ifneq (,$(filter srf04,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/srf04/include
+endif
 ```
-Give an example
-```
 
-## Deployment
+## Connecting ultrasonic sensor to nucleo board
 
-Add additional notes about how to deploy this on a live system
 
-## Built With
-
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
-
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
-
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
-
-## Authors
-
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
 
