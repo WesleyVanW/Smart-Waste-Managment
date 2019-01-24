@@ -2,7 +2,7 @@
 
 SmartWasteManagment is a device which tracks a regular garbage bin indoor aswell as outdoor. The device is triggered when opening the lid and will send valuable data such as inside temperature, capacity and location to either LoRa or Dash7 gateways. This data will be able to be processed by a backend python script to further implement the visualization in ThingsBoard. 
 
-## Information
+### Information
 
 Project name: SmartWasteManagment 
 
@@ -12,7 +12,7 @@ Professor + Assistents: Maarten Weyn, Michiel Aernouts, Mats De Meyer
 
 Contributors: Gregory Gonzalez Lopez, Mouhcine Oulad Ali, Wesley Van Wijnsberghe
 
-### What you need
+### Hardware & Software needed
 
 Vagrant 
 
@@ -42,7 +42,7 @@ ThingsBoard Account
 
 --- add picture ---
 
-## Implementation
+### Implementation
 
 1. Copy contents to the correct location in the RIOT directory: 
 
@@ -83,7 +83,7 @@ ThingsBoard Account
 11. The actions are monitorable in a serial monitor (Putty) when connected to the Octa board.
 
 
-## Copy code to Makefile.dep & Makefile.include in case of not wanting to overwrite
+### Copy code to Makefile.dep & Makefile.include in case of not wanting to overwrite
 
 - Makefile.dep: 
 ```
@@ -126,7 +126,7 @@ ifneq (,$(filter srf04,$(USEMODULE)))
 endif
 ```
 
-## Connecting ultrasonic sensor to nucleo board
+### Connecting ultrasonic sensor to nucleo board
 
 
 
