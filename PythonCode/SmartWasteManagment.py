@@ -218,7 +218,7 @@ class smartwastemanagment:
                             'distance': float(payload['distance']),
                             'x': float(payload['x']),
                             'y': float(payload['y']),
-                            'level' : int(payload['level']),
+                            'level' : float(payload['level']),
                             'frequency': float(payload['metadata']['frequency'])
                             }
 
