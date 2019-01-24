@@ -149,3 +149,17 @@ endif
     - Trig --> pin PB1 on Nucleo 
     - GND --> Source mosfet
 
+### Division of labour 
+
+- Gregory 
+  - Ultrasonic sensor 
+  - ThingsBoard 
+- Mouhcine 
+  - GPS 
+  - Power measurements
+- Wesley 
+  - Sensors (sht31 - Temperature, lsm303agr - Accelerometer)
+  - Backend - Python scripts 
+  - GitHub
+  - SmartWasteManagment C-code program
+  - Dash7 Localization
