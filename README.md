@@ -5,23 +5,37 @@ SmartWasteManagment is a device which tracks a regular garbage bin indoor aswell
 ## Information
 
 Project name: SmartWasteManagment 
+
 Course: I-IoT Low Power Embedded Communication 
+
 Professor + Assistents: Maarten Weyn, Michiel Aernouts, Mats De Meyer 
+
 Contributors: Gregory Gonzalez Lopez, Mouhcine Oulad Ali, Wesley Van Wijnsberghe
 
 ### What you need
 
 Vagrant 
+
 Riot OS : https://github.com/RIOT-OS/RIOT
+
 Dash7 Python Support: https://github.com/MOSAIC-LoPoW/pyd7a
+
 Murata Modem Support: https://github.com/MOSAIC-LoPoW/riot-oss7-modem
+
 Nucleo L496ZG 
+
 Octa connect shield 
+
 Octa connect Murata modem shield 
+
 Octa connnect GPS shield 
+
 Python 2.7
+
 MongoDB Compass 
+
 The Things Network Account 
+
 ThingsBoard Account
 
 ### Visualization of project
