@@ -40,11 +40,50 @@ ThingsBoard Account
 
 ### Visualization of project
 
+--- add picture ---
+
+## Implementation
+
+1. Copy contents to the correct location in the RIOT directory: 
+
+  - Vagrantfile --> RIOT/
+  
+  - boards/octa --> RIOT/boards 
+  
+  - drivers/include --> RIOT/drivers/include 
+  
+  - drivers/ --> RIOT/drivers 
+  
+  - src/SmartWasteManagment --> RIOT/tests // other directories are tests for the drivers 
+  
+  - sys/auto_init/saul --> RIOT/sys/auto_init/saul
+  
+  - sys/auto_init --> RIOT/sys/auto_init
+  
+  - Copy the following scripts from PythonCode to a directory of your choosing: backend, localization, SmartWasteManagment
+
+2. Import the contents of full_dataset.json in a MongoDB database called FingerprintingDB with a collection no_test_ack .
+
+3. Open Command Prompt and navigate to the RIOT directory. 
+
+4. Start vagrant in this directory (command: vagrant up) and connect to it (command: vagrant ssh).
+
+5. Connect the ultrasonic sensor to the nucleo (see further).
+
+6. Navigate to RIOT/test/SmartWasteManagment and program it on the octa board (command: make BOARD=octa flash) 
+
+7. Open Python program of your choosing (we used PyCharm) and make sure you're using Python 2.7 
+
+8. Install the Pymongo and numpy plugins. 
+
+9. Run the backend.py script and make sure both localization.py, SmartWasteManagment.py and thingsboard.py are in the same directory
+
+10. The script should now connect to both an D7 and LoRa broker assuming you are in range. 
+
+11. The actions are monitorable in a serial monitor (Putty) when connected to the Octa board.
 
 
-## Running the tests
-
-Explain how to run the automated tests for this system
+  
 
 ### Break down into end to end tests
 
