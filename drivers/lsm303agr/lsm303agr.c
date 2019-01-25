@@ -222,7 +222,7 @@ int lsm303agr_enable_interrupt(const lsm303agr_t *dev)
     //res += i2c_write_reg(DEV_I2C, DEV_ACC_ADDR,
     //                    LSM303AGR_REG_CTRL5_A ,0x08, 0); //Interrupt latched
 	res += i2c_write_reg(DEV_I2C, DEV_ACC_ADDR,
-                        LSM303AGR_REG_INT1_THS_A ,0x32, 0); //Set threshold = 250mg //0x10
+                        LSM303AGR_REG_INT1_THS_A ,0x10, 0); //Set threshold = 250mg //0x10
 	res += i2c_write_reg(DEV_I2C, DEV_ACC_ADDR,
                         LSM303AGR_REG_INT1_DURATION_A ,0x00, 0); //Set minimum event duration
 
